@@ -1,7 +1,9 @@
 import React, { useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { verifyOtpApi } from '../utils/fakeApi'
 import { useAuth } from '../context/AuthContext'
+import Spinner from '../components/Spinner'
 import '../styles/global.css'
 
 export default function Otp() {
@@ -11,6 +13,11 @@ export default function Otp() {
   const [error, setError] = useState('')
   const auth = useAuth()
   const navigate = useNavigate()
+
+  React.useEffect(() => {
+    // auto-focus the first box when component mounts
+    focusInput(0)
+  }, [])
 
   function focusInput(idx) {
     const el = inputsRef.current[idx]
@@ -32,6 +39,19 @@ export default function Otp() {
     if (idx < 5) focusInput(idx + 1)
   }
 
+  function handlePaste(e) {
+    e.preventDefault()
+    const paste = e.clipboardData.getData('text').replace(/\D/g, '')
+    if (paste.length === 6) {
+      const arr = paste.split('')
+      setValues(arr)
+      // submit automatically
+      setTimeout(() => {
+        document.getElementById('otp-form')?.requestSubmit()
+      }, 50)
+    }
+  }
+
   function handleKeyDown(e, idx) {
     if (e.key === 'Backspace' && !values[idx] && idx > 0) {
       focusInput(idx - 1)
@@ -50,7 +70,7 @@ export default function Otp() {
     try {
       await verifyOtpApi(code)
       auth.verifyOtp()
-      navigate('/success')
+      navigate('/success', { replace: true })
     } catch (err) {
       setError(err?.message || 'Verification failed')
     } finally {
@@ -58,11 +78,27 @@ export default function Otp() {
     }
   }
 
+  function handleKeyDown(e, idx) {
+    if (e.key === 'Backspace' && !values[idx] && idx > 0) {
+      focusInput(idx - 1)
+    }
+    if (e.key === 'Enter') {
+      document.getElementById('otp-form')?.requestSubmit()
+    }
+  }
+
   return (
     <div className="page center">
-      <h1>Enter OTP</h1>
-      <form className="card" onSubmit={handleSubmit}>
-        <div className="otp-row">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="inner"
+      >
+        <h1>Enter OTP</h1>
+        {auth.user?.email && <p>We sent a code to <strong>{auth.user.email}</strong></p>}
+      <form id="otp-form" className="card" onSubmit={handleSubmit}>
+        <div className="otp-row" onPaste={handlePaste}>
           {values.map((v, i) => (
             <input
               key={i}
@@ -73,14 +109,16 @@ export default function Otp() {
               onKeyDown={(e) => handleKeyDown(e, i)}
               maxLength={1}
               inputMode="numeric"
+              aria-label={`Digit ${i + 1}`}
             />
           ))}
         </div>
         {error && <div className="error">{error}</div>}
         <button className="btn" type="submit" disabled={loading}>
-          {loading ? 'Verifying…' : 'Verify OTP'}
+          {loading ? <Spinner size={18} /> : 'Verify OTP'}
         </button>
       </form>
-    </div>
+        </motion.div>
+      </div>
   )
 }
