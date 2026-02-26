@@ -1,12 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { signupApi } from '../utils/fakeApi'
 import { useAuth } from '../context/AuthContext'
+import Spinner from '../components/Spinner'
 import '../styles/global.css'
 
 export default function Signup() {
   const navigate = useNavigate()
   const auth = useAuth()
+
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      navigate('/dashboard', { replace: true })
+    } else if (auth.isOtpVerified) {
+      navigate('/success', { replace: true })
+    } else if (auth.isSignedUp) {
+      navigate('/otp', { replace: true })
+    }
+  }, [auth, navigate])
 
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [errors, setErrors] = useState({})
@@ -37,7 +49,7 @@ export default function Signup() {
     try {
       const res = await signupApi(form)
       auth.signup(res.user)
-      navigate('/otp')
+      navigate('/otp', { replace: true })
     } catch (err) {
       setServerError(err?.message || 'Signup failed')
     } finally {
@@ -47,8 +59,14 @@ export default function Signup() {
 
   return (
     <div className="page center">
-      <h1>Sign Up</h1>
-      <form className="card form" onSubmit={handleSubmit} noValidate>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="inner"
+      >
+        <h1>Sign Up</h1>
+        <form className="card form" onSubmit={handleSubmit} noValidate>
         <label>
           Name
           <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
@@ -67,7 +85,7 @@ export default function Signup() {
 
         {serverError && <div className="error">{serverError}</div>}
         <button className="btn" type="submit" disabled={loading}>
-          {loading ? 'Signing up…' : 'Sign Up'}
+          {loading ? <Spinner size={18} /> : 'Sign Up'}
         </button>
         {serverError === 'Network error' && (
           <button
@@ -80,7 +98,8 @@ export default function Signup() {
             Retry
           </button>
         )}
-      </form>
+        </form>
+      </motion.div>
     </div>
   )
 }
