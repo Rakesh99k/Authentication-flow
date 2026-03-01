@@ -24,6 +24,12 @@ export default function Signup() {
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
   const [serverError, setServerError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const nameRef = React.useRef()
+
+  React.useEffect(() => {
+    nameRef.current?.focus()
+  }, [])
 
   function validate() {
     const e = {}
@@ -57,6 +63,12 @@ export default function Signup() {
     }
   }
 
+  function passwordStrength(pw) {
+    if (pw.length > 8 && /[A-Z]/.test(pw) && /[0-9]/.test(pw)) return 'strong'
+    if (pw.length >= 6) return 'medium'
+    return 'weak'
+  }
+
   return (
     <div className="page center">
       <motion.div
@@ -69,22 +81,69 @@ export default function Signup() {
         <form className="card form" onSubmit={handleSubmit} noValidate>
         <label>
           Name
-          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          <input
+            ref={nameRef}
+            type="text"
+            autoComplete="name"
+            value={form.name}
+            onChange={(e) => {
+              setForm({ ...form, name: e.target.value })
+              if (errors.name) setErrors({ ...errors, name: undefined })
+            }}
+          />
           {errors.name && <div className="error">{errors.name}</div>}
         </label>
         <label>
           Email
-          <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <input
+            type="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={(e) => {
+              setForm({ ...form, email: e.target.value })
+              if (errors.email) setErrors({ ...errors, email: undefined })
+            }}
+          />
           {errors.email && <div className="error">{errors.email}</div>}
         </label>
-        <label>
-          Password
-          <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <label style={{position:'relative'}}>
+          Password <small style={{fontSize:'12px', color:'#555'}}>(min 6 characters)</small>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+          <button
+            type="button"
+            className="password-toggle"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            onClick={() => setShowPassword((v) => !v)}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </button>
           {errors.password && <div className="error">{errors.password}</div>}
+          {form.password && (
+            <div
+              className={
+                'strength-meter ' + passwordStrength(form.password)
+              }
+            >
+              Password strength: {passwordStrength(form.password)}
+            </div>
+          )}
         </label>
 
         {serverError && <div className="error">{serverError}</div>}
-        <button className="btn" type="submit" disabled={loading}>
+        <button
+          className="btn"
+          type="submit"
+          disabled={
+            loading ||
+            !form.name.trim() ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ||
+            form.password.length < 6
+          }
+        >
           {loading ? <Spinner size={18} /> : 'Sign Up'}
         </button>
         {serverError === 'Network error' && (
