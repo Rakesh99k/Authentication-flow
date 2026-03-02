@@ -16,6 +16,11 @@ body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;margin:0;background:v
 .btn:hover:not([disabled]){background:#094ecc}
 .btn[disabled]{opacity:0.6;cursor:default}
 .error{color:var(--danger);margin-top:6px}
+.password-toggle{position:absolute;top:36px;right:10px;background:none;border:none;cursor:pointer;font-size:14px}
+.strength-meter{margin-top:4px;font-size:13px;color:#555}
+.strength-meter.weak{color:var(--danger)}
+.strength-meter.medium{color:orange}
+.strength-meter.strong{color:green}
 .otp-row{display:flex;gap:8px;justify-content:center;margin:18px 0}
 .otp-input{width:44px;height:56px;font-size:24px;text-align:center;border-radius:8px;border:1px solid #ccc;transition:border-color 0.2s}
 .otp-input:focus{border-color:var(--accent);outline:none}
