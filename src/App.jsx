@@ -1,3 +1,5 @@
+// top-level application component defining all routes
+// ProtectedRoute is used to guard pages based on auth state
 import './App.css'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Signup from './pages/Signup'
@@ -13,8 +15,11 @@ function App() {
 
   return (
     <Routes>
+      {/* default redirect to signup */}
       <Route path="/" element={<Navigate to="/signup" replace />} />
+      {/* open registration page */}
       <Route path="/signup" element={<Signup />} />
+      {/* otp page only if user signed up */}
       <Route
         path="/otp"
         element={
@@ -23,6 +28,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      {/* success confirmation after otp verification */}
       <Route
         path="/success"
         element={
@@ -31,6 +37,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      {/* dashboard only when fully authenticated */}
       <Route
         path="/dashboard"
         element={
