@@ -1,7 +1,9 @@
+// lightweight spinner component used during async operations
 import React from 'react'
 import '../styles/global.css'
 
 export default function Spinner({ size = 24 }) {
+  // simple CSS-based rotating circle
   return (
     <div
       className="spinner"
