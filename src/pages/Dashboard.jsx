@@ -1,3 +1,4 @@
+// dashboard shown after authentication; displays user info
 import React from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +9,7 @@ export default function Dashboard() {
   const auth = useAuth()
   const navigate = useNavigate()
 
+  // clear auth state and redirect to signup
   function handleLogout() {
     auth.logout()
     navigate('/signup', { replace: true })
@@ -22,6 +24,7 @@ export default function Dashboard() {
       >
         <h1>Dashboard</h1>
         <div className="card">
+          {/* display user info stored in context */}
           <p><strong>Name:</strong> {auth.user?.name || '-'}</p>
           <p><strong>Email:</strong> {auth.user?.email || '-'}</p>
           <button className="btn" onClick={handleLogout}>Logout</button>
