@@ -1,3 +1,4 @@
+// simple 404 page that informs user when route is missing
 import React from 'react'
 import { motion } from 'framer-motion'
 import '../styles/global.css'
@@ -5,6 +6,7 @@ import '../styles/global.css'
 export default function NotFound() {
   return (
     <div className="page center">
+      {/* animate fade in for nicer UX */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
