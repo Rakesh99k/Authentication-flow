@@ -1,6 +1,6 @@
 // dashboard shown after authentication; displays user info
 import React from 'react'
-import { motion } from 'framer-motion'
+import { motion as Motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/global.css'
@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   return (
     <div className="page center">
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -29,7 +29,7 @@ export default function Dashboard() {
           <p><strong>Email:</strong> {auth.user?.email || '-'}</p>
           <button className="btn" onClick={handleLogout}>Logout</button>
         </div>
-      </motion.div>
+      </Motion.div>
     </div>
   )
 }
