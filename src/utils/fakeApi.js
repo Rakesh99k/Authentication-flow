@@ -10,6 +10,9 @@ export function signupApi({ name, email, password }) {
       if (typeof email === 'string' && email.toLowerCase().includes('exists')) {
         return reject({ message: 'Email already exists' })
       }
+      if (typeof password !== 'string' || password.length < 6) {
+        return reject({ message: 'Invalid payload' })
+      }
       // success case returns user object
       resolve({ success: true, user: { name, email } })
     }, delay)
