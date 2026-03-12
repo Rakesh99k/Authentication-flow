@@ -1,5 +1,7 @@
+// signup page allows a new user to register
+// includes client-side validation, password strength, and UX enhancements
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion as Motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { signupApi } from '../utils/fakeApi'
 import { useAuth } from '../context/AuthContext'
@@ -18,7 +20,7 @@ export default function Signup() {
     } else if (auth.isSignedUp) {
       navigate('/otp', { replace: true })
     }
-  }, [auth, navigate])
+  }, [auth.isAuthenticated, auth.isOtpVerified, auth.isSignedUp, navigate])
 
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [errors, setErrors] = useState({})
@@ -31,6 +33,7 @@ export default function Signup() {
     nameRef.current?.focus()
   }, [])
 
+  // perform client-side validation and collect errors
   function validate() {
     const e = {}
     if (!form.name.trim()) e.name = 'Name is required'
@@ -39,9 +42,11 @@ export default function Signup() {
     if (!form.password) e.password = 'Password is required'
     else if (form.password.length < 6) e.password = 'Password must be at least 6 characters'
     setErrors(e)
+    // return true if there are no errors
     return Object.keys(e).length === 0
   }
 
+  // form submit handler: validate then attempt signup
   async function handleSubmit(e) {
     e.preventDefault()
     setServerError('')
@@ -49,6 +54,7 @@ export default function Signup() {
     await performSignup()
   }
 
+  // calls fake API and updates context on success
   async function performSignup() {
     setLoading(true)
     setServerError('')
@@ -71,7 +77,7 @@ export default function Signup() {
 
   return (
     <div className="page center">
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -119,7 +125,7 @@ export default function Signup() {
             aria-label={showPassword ? 'Hide password' : 'Show password'}
             onClick={() => setShowPassword((v) => !v)}
           >
-            {showPassword ? '🙈' : '👁️'}
+            {showPassword ? 'Hide' : 'Show'}
           </button>
           {errors.password && <div className="error">{errors.password}</div>}
           {form.password && (
@@ -158,7 +164,8 @@ export default function Signup() {
           </button>
         )}
         </form>
-      </motion.div>
+      </Motion.div>
     </div>
   )
 }
+
